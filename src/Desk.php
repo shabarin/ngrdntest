@@ -3,7 +3,11 @@
 class Desk {
     private $figures = [];
 
+    private $isBlackMove;
+
     public function __construct() {
+        $this->isBlackMove = false;
+
         $this->figures['a'][1] = new Rook(false);
         $this->figures['b'][1] = new Knight(false);
         $this->figures['c'][1] = new Bishop(false);
@@ -51,10 +55,25 @@ class Desk {
         $xTo   = $match[3];
         $yTo   = $match[4];
 
-        if (isset($this->figures[$xFrom][$yFrom])) {
-            $this->figures[$xTo][$yTo] = $this->figures[$xFrom][$yFrom];
+        $from = new Field($xFrom, $yFrom);
+        $to = new Field($xTo, $yTo);
+
+        $this->doMove($from, $to);
+    }
+
+    private function doMove(Field $from, Field $to): void
+    {
+        $figure = $this->getFigureAt($from);
+        if (!$figure) {
+            throw new \Exception('Invalid move.');
         }
-        unset($this->figures[$xFrom][$yFrom]);
+        if ($figure->isBlack() !== $this->isBlackMove) {
+            throw new \Exception('Invalid move (not your turn).');
+        }
+        
+        $this->isBlackMove = !$this->isBlackMove;
+        $this->figures[$to->getX()][$to->getY()] = $figure;
+        unset($this->figures[$from->getX()][$from->getY()]);
     }
 
     public function dump() {
@@ -71,4 +90,22 @@ class Desk {
         }
         echo "  abcdefgh\n";
     }
+
+    private function getFigureAt(Field $from): ?Figure
+    {
+        if (!isset($this->figures[$from->getX()][$from->getY()])) {
+            return null;
+        }
+
+        return $this->figures[$from->getX()][$from->getY()];
+    }
+
+//    private function putFigureAt(Figure $figure, Field $from): void
+//    {
+//        if (!isset($this->figures[$from->getX()][$from->getY()])) {
+//            throw new \Exception('Trying to get figure on empty field.');
+//        }
+//
+//        return $this->figures[$from->getX()][$from->getY()];
+//    }
 }

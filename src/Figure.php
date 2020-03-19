@@ -1,10 +1,17 @@
 <?php
 
 class Figure {
+
+    /** @var bool  */
     protected $isBlack;
 
-    public function __construct($isBlack) {
+    public function __construct(bool $isBlack) {
         $this->isBlack = $isBlack;
+    }
+
+    public function isBlack(): bool
+    {
+        return $this->isBlack;
     }
 
     /** @noinspection PhpToStringReturnInspection */
